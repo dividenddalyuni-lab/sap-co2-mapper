@@ -20,7 +20,9 @@ export default function CSRDReportPage() {
 
   const perioden = [...new Set(bookingLines.map((b) => b.periode))];
   const berichtszeitraum =
-    perioden.length > 0 ? `${perioden[0]} – ${perioden[perioden.length - 1]}` : "Januar 2024 – Q2 2024";
+    perioden.length > 0
+      ? `${perioden[0]} – ${perioden[perioden.length - 1]}`
+      : "Januar 2024 – Q2 2024";
 
   const generationDate = new Date().toLocaleDateString("de-DE", {
     day: "2-digit",
@@ -29,31 +31,104 @@ export default function CSRDReportPage() {
   });
 
   const handlePrint = () => {
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
+    const content = document.getElementById("csrd-report-content")?.innerHTML || "";
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+    if (!printWindow) return;
 
-    const reportHTML = document.getElementById("csrd-report-content")?.innerHTML;
-    const printCSS = document.querySelector("style[data-csrd-print-styles]")?.textContent ?? "";
+    printWindow.document.write(`<!DOCTYPE html>
+<html><head>
+<title>Muster GmbH CSRD Report 2024</title>
+<meta charset="utf-8"/>
+<style>
+  @page { margin: 15mm 15mm 20mm 15mm; size: A4; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+  html, body { background: #fff; }
+  body { font-family: Arial, sans-serif; font-size: 10px; color: #1a1a1a; margin: 0; }
 
-    iframe.contentDocument?.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Muster GmbH CSRD Report 2024</title>
-          <style>${printCSS}</style>
-        </head>
-        <body>${reportHTML ?? ""}</body>
-      </html>
-    `);
+  /* COVER PAGE */
+  .cover-page { page-break-after: always; min-height: 260mm; display: flex; flex-direction: column; }
+  .cover-header { background: #1a3a2a; color: white; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; margin: -15mm -15mm 0 -15mm; }
+  .cover-header .logo { font-size: 18px; font-weight: 700; letter-spacing: 4px; color: white; }
+  .cover-header .subtitle { font-size: 10px; color: #9fe1cb; letter-spacing: 2px; text-transform: uppercase; }
+  .cover-body { padding: 48px 0 0 0; flex: 1; }
+  .cover-company { font-size: 36px; font-weight: 700; color: #1a3a2a; margin: 40px 0 8px 0; }
+  .cover-title { font-size: 20px; color: #444; margin-bottom: 16px; font-weight: 400; }
+  .cover-meta { font-size: 10px; color: #777; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; border-bottom: 2px solid #1a3a2a; padding-bottom: 12px; }
+  .cover-period { font-size: 12px; color: #444; margin-bottom: 4px; }
+  .cover-date { font-size: 11px; color: #888; margin-bottom: 40px; }
+  .scope-boxes { display: flex; gap: 16px; margin-top: 32px; }
+  .scope-box { flex: 1; border-radius: 8px; padding: 20px; text-align: center; }
+  .scope-box.s1 { background: #e8f5e9; border: 2px solid #2d6a4f; }
+  .scope-box.s2 { background: #fff8e1; border: 2px solid #f4a261; }
+  .scope-box.s3 { background: #fbe9e7; border: 2px solid #e76f51; }
+  .scope-box .label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 6px; }
+  .scope-box .value { font-size: 24px; font-weight: 700; color: #1a1a1a; }
+  .scope-box .unit { font-size: 10px; color: #666; margin-left: 4px; font-weight: 400; }
+  .cover-footer-note { margin-top: 40px; padding: 16px 20px; background: #f5f5f5; font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-    iframe.contentDocument?.close();
-    iframe.contentWindow?.focus();
-    iframe.contentWindow?.print();
+  /* PAGE HEADER */
+  .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1a3a2a; padding-bottom: 8px; margin-bottom: 18px; }
+  .page-header .co { font-size: 12px; font-weight: 700; color: #1a3a2a; }
+  .page-header .rep { font-size: 9px; color: #888; letter-spacing: 1px; text-transform: uppercase; }
 
+  h2.section-title { font-size: 14px; font-weight: 700; color: #1a3a2a; margin: 0 0 10px 0; }
+
+  /* SCOPE HEADERS */
+  .scope-header { display: flex; justify-content: space-between; align-items: center; margin: 22px 0 4px 0; padding-left: 12px; }
+  .scope-header.s1 { border-left: 4px solid #2d6a4f; }
+  .scope-header.s2 { border-left: 4px solid #f4a261; }
+  .scope-header.s3 { border-left: 4px solid #e76f51; }
+  .scope-header h2 { font-size: 13px; font-weight: 700; margin: 0; color: #1a1a1a; }
+  .scope-header .total-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; }
+  .scope-header.s1 .total-badge { background: #e8f5e9; color: #2d6a4f; }
+  .scope-header.s2 .total-badge { background: #fff8e1; color: #e65100; }
+  .scope-header.s3 .total-badge { background: #fbe9e7; color: #bf360c; }
+  .scope-desc { font-size: 9px; color: #888; margin: 0 0 10px 16px; }
+
+  /* TABLES */
+  table.report-table { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 8px; page-break-inside: auto; }
+  table.report-table thead { display: table-header-group; }
+  table.report-table thead tr { background: #1a3a2a !important; color: #fff !important; }
+  table.report-table thead th { background: #1a3a2a !important; color: #fff !important; padding: 6px 8px; text-align: left; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  table.report-table th.num, table.report-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.report-table th.center, table.report-table td.center { text-align: center; }
+  table.report-table tbody tr { page-break-inside: avoid; }
+  table.report-table tbody tr:nth-child(even) td { background: #f8faf9 !important; }
+  table.report-table tbody td { padding: 5px 8px; border-bottom: 1px solid #eee; vertical-align: top; color: #222; }
+  table.report-table tr.sum-row td { font-weight: 700; font-size: 10px; border-top: 2px solid #1a3a2a; background: #f0f4f0 !important; padding: 6px 8px; }
+
+  /* SUMMARY TABLE */
+  .summary-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 10px; }
+  .summary-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+  .summary-table .label { color: #555; width: 60%; }
+  .summary-table .val { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .summary-table tr.total-row td { background: #1a3a2a !important; color: #fff !important; font-weight: 700; }
+
+  /* CALLOUT BOXES */
+  .methodik-box { background: #f5f5f5; border-left: 4px solid #1a3a2a; padding: 14px 16px; margin: 18px 0; font-size: 9.5px; line-height: 1.6; border-radius: 0 4px 4px 0; }
+  .methodik-box h3 { font-size: 11px; margin: 0 0 8px 0; color: #1a3a2a; }
+  .gaps-box { background: #fff8e1; border-left: 4px solid #f4a261; padding: 14px 16px; margin: 14px 0; font-size: 9.5px; line-height: 1.6; border-radius: 0 4px 4px 0; }
+  .gaps-box h3 { font-size: 11px; margin: 0 0 8px 0; color: #e65100; }
+  .gaps-box ul, .reco-box ul { margin: 4px 0; padding-left: 18px; }
+  .gaps-box li, .reco-box li { margin-bottom: 3px; }
+  .reco-box { background: #e8f5e9; border-left: 4px solid #2d6a4f; padding: 14px 16px; margin: 14px 0; font-size: 9.5px; line-height: 1.6; border-radius: 0 4px 4px 0; }
+  .reco-box h3 { font-size: 11px; margin: 0 0 8px 0; color: #1a3a2a; }
+
+  .exec-summary { background: #f8faf9; border: 1px solid #e0e0e0; padding: 12px 14px; font-size: 10px; line-height: 1.5; border-radius: 4px; }
+
+  .page-break { page-break-after: always; }
+  .avoid-break { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+${content}
+</body></html>`);
+    printWindow.document.close();
+    printWindow.focus();
     setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 1000);
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   };
 
   useEffect(() => {
@@ -66,256 +141,16 @@ export default function CSRDReportPage() {
 
   return (
     <>
-      {/* Print-only styles for auditor-grade PDF */}
-      <style data-csrd-print-styles>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 18mm 16mm 22mm 16mm;
-            @bottom-left {
-              content: "Muster GmbH · CSRD-Bericht 2024 · ESRS E1 Klimawandel";
-              font-family: Arial, system-ui, sans-serif;
-              font-size: 8pt;
-              color: #555;
-            }
-            @bottom-center {
-              content: "CLYMAIQ";
-              font-family: Arial, system-ui, sans-serif;
-              font-size: 8pt;
-              font-weight: 700;
-              letter-spacing: 0.15em;
-              color: #1a3a2a;
-            }
-            @bottom-right {
-              content: "Seite " counter(page) " von " counter(pages);
-              font-family: Arial, system-ui, sans-serif;
-              font-size: 8pt;
-              color: #555;
-            }
-          }
-
-          html, body {
-            background: #fff !important;
-            color: #111 !important;
-            font-family: Arial, system-ui, sans-serif !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-
-          /* Hide app chrome */
-          aside, nav, header, .no-print { display: none !important; }
-          main { overflow: visible !important; }
-
-          /* Reset card wrapper */
-          .report-shell {
-            border: none !important;
-            box-shadow: none !important;
-            background: #fff !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-          }
-          .report-shell > .report-title-block { display: none !important; }
-          .report-shell > .report-body { padding: 0 !important; }
-          .screen-header { display: none !important; }
-
-          /* Cover page */
-          .print-cover { display: block !important; page-break-after: always; }
-
-          .print-cover-header {
-            background: #1a3a2a !important;
-            color: #fff !important;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            padding: 0 14mm;
-            margin: -18mm -16mm 14mm -16mm;
-          }
-          .print-cover-header .logo {
-            font-weight: 800;
-            font-size: 16pt;
-            letter-spacing: 0.18em;
-            color: #fff;
-          }
-          .print-cover-header .tag {
-            font-size: 8pt;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: #b9d4c4;
-            margin-left: 10px;
-            border-left: 1px solid #2d6a4f;
-            padding-left: 10px;
-          }
-          .print-cover h1.company {
-            font-size: 32pt;
-            font-weight: 800;
-            color: #111;
-            margin: 30mm 0 6pt 0;
-            line-height: 1.1;
-          }
-          .print-cover h2.sub {
-            font-size: 20pt;
-            color: #555;
-            font-weight: 400;
-            margin: 0 0 18pt 0;
-          }
-          .print-cover .smallcaps {
-            font-size: 9pt;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #1a3a2a;
-            font-weight: 600;
-            margin-bottom: 24pt;
-          }
-          .print-cover .meta {
-            font-size: 10pt;
-            color: #333;
-            margin-bottom: 4pt;
-          }
-          .print-cover .scope-summary {
-            margin-top: 28mm;
-            display: flex;
-            gap: 10mm;
-            border-top: 2px solid #1a3a2a;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 14pt 0;
-          }
-          .print-cover .scope-card {
-            flex: 1;
-            border-left: 4px solid #ccc;
-            padding-left: 10pt;
-          }
-          .print-cover .scope-card.s1 { border-left-color: #2d6a4f; }
-          .print-cover .scope-card.s2 { border-left-color: #f4a261; }
-          .print-cover .scope-card.s3 { border-left-color: #e76f51; }
-          .print-cover .scope-card .label {
-            font-size: 8pt;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: #555;
-          }
-          .print-cover .scope-card .value {
-            font-size: 18pt;
-            font-weight: 700;
-            color: #111;
-            margin-top: 4pt;
-          }
-          .print-cover .scope-card .unit {
-            font-size: 9pt;
-            color: #777;
-            margin-left: 4pt;
-            font-weight: 400;
-          }
-
-          /* Section spacing */
-          .print-section { page-break-inside: avoid; margin-top: 18pt; }
-          .print-section + .print-section { margin-top: 22pt; }
-
-          /* Scope headers */
-          .scope-header {
-            display: flex !important;
-            align-items: center;
-            justify-content: space-between;
-            border-left: 4px solid #999;
-            padding: 4pt 10pt;
-            background: #f8faf9;
-            margin-bottom: 8pt;
-          }
-          .scope-header.s1 { border-left-color: #2d6a4f; }
-          .scope-header.s2 { border-left-color: #f4a261; }
-          .scope-header.s3 { border-left-color: #e76f51; }
-          .scope-header .title { font-size: 13pt; font-weight: 700; color: #111; }
-          .scope-header .desc { font-size: 9pt; color: #555; font-weight: 400; margin-top: 2pt; }
-          .scope-header .badge {
-            font-size: 10pt;
-            font-weight: 700;
-            color: #1a3a2a;
-            background: #fff;
-            border: 1px solid #1a3a2a;
-            padding: 3pt 8pt;
-            border-radius: 3pt;
-            white-space: nowrap;
-          }
-
-          /* Tables */
-          table.report-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, system-ui, sans-serif;
-            font-size: 9pt;
-            margin: 0;
-          }
-          table.report-table thead { display: table-header-group; }
-          table.report-table thead tr {
-            background: #1a3a2a !important;
-            color: #fff !important;
-          }
-          table.report-table thead th {
-            background: #1a3a2a !important;
-            color: #fff !important;
-            font-size: 8pt;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 6pt 6pt;
-            font-weight: 600;
-            border: none;
-          }
-          table.report-table tbody tr {
-            border-bottom: 1px solid #e0e0e0;
-            page-break-inside: avoid;
-          }
-          table.report-table tbody tr:nth-child(even) td { background: #f8faf9 !important; }
-          table.report-table tbody td {
-            padding: 5pt 6pt;
-            font-size: 9pt;
-            color: #222;
-            vertical-align: top;
-          }
-          table.report-table td.num, table.report-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
-          table.report-table td.center, table.report-table th.center { text-align: center; }
-          table.report-table tfoot tr { border-top: 2px solid #1a3a2a; }
-          table.report-table tfoot td {
-            padding: 6pt;
-            font-weight: 700;
-            font-size: 10pt;
-            background: #fff !important;
-          }
-
-          /* Callout boxes */
-          .methodik-box {
-            background: #f3f4f3 !important;
-            border-left: 4px solid #1a3a2a;
-            padding: 10pt 12pt;
-            font-size: 9.5pt;
-            line-height: 1.5;
-            color: #222;
-          }
-          .gaps-box {
-            background: #fff8e6 !important;
-            border-left: 4px solid #d49a00;
-            padding: 10pt 12pt;
-            font-size: 9.5pt;
-            line-height: 1.5;
-            color: #5a4500;
-          }
-          .gaps-box h3 { color: #5a4500 !important; font-size: 9pt; }
-          .gaps-box li { color: #5a4500 !important; }
-          .gaps-box .dot { background: #d49a00 !important; }
-
-          .print-footer-inline { display: none !important; }
-          .exec-summary { background: #f8faf9 !important; border: 1px solid #e0e0e0; padding: 10pt; }
-        }
-
-        /* Screen: hide cover */
+      {/* Screen-only: hide cover page & print-only chrome */}
+      <style>{`
         @media screen {
-          .print-cover { display: none; }
+          .cover-page, .page-header { display: none; }
         }
       `}</style>
 
       <div className="p-6 space-y-6">
         {/* Header (screen only) */}
-        <div className="flex items-center justify-between screen-header no-print">
+        <div className="flex items-center justify-between no-print">
           <p className="text-xs text-muted-foreground">
             CLYMAIQ ESG / <span className="font-semibold text-foreground">CSRD Report</span>
           </p>
@@ -337,153 +172,176 @@ export default function CSRDReportPage() {
           </div>
         </div>
 
-        {/* Report */}
-        <div id="csrd-report-content" className="report-shell bg-card rounded-xl border border-border max-w-4xl mx-auto print:border-none print:shadow-none">
-          {/* Print-only cover page */}
-          <div className="print-cover">
-            <div className="print-cover-header">
+        {/* Report content — cloned into print window */}
+        <div
+          id="csrd-report-content"
+          className="bg-card rounded-xl border border-border max-w-4xl mx-auto p-8 space-y-6"
+        >
+          {/* COVER PAGE (print only) */}
+          <div className="cover-page">
+            <div className="cover-header">
               <span className="logo">CLYMAIQ</span>
-              <span className="tag">ESG Platform</span>
+              <span className="subtitle">ESG Platform</span>
             </div>
-            <h1 className="company">Muster GmbH</h1>
-            <h2 className="sub">CSRD-Nachhaltigkeitsbericht 2024</h2>
-            <div className="smallcaps">
-              Gemäß ESRS E1 · GHG Protocol · Automatisch aus SAP FI/CO generiert
-            </div>
-            <div className="meta">
-              <strong>Berichtszeitraum:</strong> {berichtszeitraum}
-            </div>
-            <div className="meta">
-              <strong>Erstellt am:</strong> {generationDate}
-            </div>
+            <div className="cover-body">
+              <h1 className="cover-company">Muster GmbH</h1>
+              <div className="cover-title">CSRD-Nachhaltigkeitsbericht 2024</div>
+              <div className="cover-meta">
+                Gemäß ESRS E1 · GHG Protocol · Automatisch aus SAP FI/CO generiert
+              </div>
+              <div className="cover-period">
+                <strong>Berichtszeitraum:</strong> {berichtszeitraum}
+              </div>
+              <div className="cover-date">Erstellt am: {generationDate}</div>
 
-            <div className="scope-summary">
-              <div className="scope-card s1">
-                <div className="label">Scope 1 — Direkt</div>
-                <div className="value">
-                  {formatTonnes(s1)}
-                  <span className="unit">t CO₂e</span>
+              <div className="scope-boxes">
+                <div className="scope-box s1">
+                  <div className="label">Scope 1 — Direkt</div>
+                  <div className="value">
+                    {formatTonnes(s1)}
+                    <span className="unit">t CO₂e</span>
+                  </div>
+                </div>
+                <div className="scope-box s2">
+                  <div className="label">Scope 2 — Energie</div>
+                  <div className="value">
+                    {formatTonnes(s2)}
+                    <span className="unit">t CO₂e</span>
+                  </div>
+                </div>
+                <div className="scope-box s3">
+                  <div className="label">Scope 3 — Wertschöpfung</div>
+                  <div className="value">
+                    {formatTonnes(s3)}
+                    <span className="unit">t CO₂e</span>
+                  </div>
                 </div>
               </div>
-              <div className="scope-card s2">
-                <div className="label">Scope 2 — Energie</div>
-                <div className="value">
-                  {formatTonnes(s2)}
-                  <span className="unit">t CO₂e</span>
-                </div>
-              </div>
-              <div className="scope-card s3">
-                <div className="label">Scope 3 — Wertschöpfung</div>
-                <div className="value">
-                  {formatTonnes(s3)}
-                  <span className="unit">t CO₂e</span>
-                </div>
+
+              <div className="cover-footer-note">
+                CLYMAIQ ESG Platform · Powered by Claude AI · GHG Protocol · CSRD / ESRS E1
               </div>
             </div>
           </div>
 
-          {/* Screen Title Block */}
-          <div className="report-title-block bg-sidebar text-sidebar-foreground p-8 rounded-t-xl print:bg-[hsl(155,35%,14%)]">
+          {/* PAGE HEADER (print only, repeats visually after cover) */}
+          <div className="page-header">
+            <span className="co">Muster GmbH</span>
+            <span className="rep">CSRD-Bericht 2024 · ESRS E1</span>
+          </div>
+
+          {/* Screen title block */}
+          <div className="bg-sidebar text-sidebar-foreground p-6 rounded-lg no-print">
             <h1 className="text-xl font-bold">CSRD-Nachhaltigkeitsbericht 2024 — Muster GmbH</h1>
             <p className="text-sm text-sidebar-muted mt-1">
               Geschäftsjahr {berichtszeitraum} · ESRS-konform · automatisch aus SAP FI/CO generiert
             </p>
           </div>
 
-          <div className="report-body p-8 space-y-8">
-            {/* Executive Summary */}
-            <section className="print-section">
-              <h2 className="text-lg font-bold mb-3 text-foreground">
-                CSRD Nachhaltigkeitsbericht — ESRS E1 Klimawandel
-              </h2>
-              <div className="exec-summary bg-muted/50 rounded-lg p-4">
-                <p className="text-sm leading-relaxed text-foreground">
-                  Im Berichtszeitraum {berichtszeitraum} wurden insgesamt{" "}
-                  <strong>{formatTonnes(total)} t CO₂e</strong> emittiert. Davon entfallen{" "}
-                  {formatTonnes(s1)} t auf Scope 1 (direkte Emissionen), {formatTonnes(s2)} t auf
-                  Scope 2 (Energiebezug) und {formatTonnes(s3)} t auf Scope 3 (Wertschöpfungskette).
-                  Die Datenqualität beträgt <strong>{quality.score} %</strong>.
-                </p>
-              </div>
-            </section>
-
-            <ScopeSection
-              scopeKey="s1"
-              title="Scope 1: Direkte Emissionen"
-              description="Emissionen aus eigenen oder kontrollierten Quellen (Fuhrpark, Heizung, Produktion)"
-              lines={scope1Lines}
-              total={s1}
-            />
-            <ScopeSection
-              scopeKey="s2"
-              title="Scope 2: Energiebedingte Emissionen"
-              description="Emissionen aus eingekaufter Energie (Strom, Fernwärme)"
-              lines={scope2Lines}
-              total={s2}
-            />
-            <ScopeSection
-              scopeKey="s3"
-              title="Scope 3: Emissionen der Wertschöpfungskette"
-              description="Indirekte Emissionen aus vor- und nachgelagerten Aktivitäten"
-              lines={scope3Lines}
-              total={s3}
-            />
-
-            {/* Methodology */}
-            <section className="print-section">
-              <h2 className="text-base font-bold mb-2">Methodik</h2>
-              <div className="methodik-box bg-muted/40 border-l-4 border-primary/70 rounded p-4">
-                <p className="text-sm text-foreground leading-relaxed">
-                  Berechnung nach GHG Protocol Corporate Standard. Methode: Spend-Based EEIO
-                  (Environmentally Extended Input-Output) gemäß GHG Protocol Corporate Value Chain
-                  (Scope 3) Standard. Alle Emissionen werden aus monetären SAP FI/CO Buchungsdaten
-                  abgeleitet — ohne manuelle Eingabe. Emissionsfaktoren: UBA 2024, DEFRA 2024,
-                  GHG Protocol EEIO.
-                </p>
-              </div>
-            </section>
-
-            {/* Data Gaps */}
-            <section className="print-section">
-              <h2 className="text-base font-bold mb-3">Datenlücken & Empfehlungen</h2>
-              <div className="gaps-box bg-amber-50 border-l-4 border-amber-500 rounded p-4 space-y-3">
-                {quality.fehlende_scopes.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold mb-2 text-amber-900">
-                      Fehlende Scope-Kategorien:
-                    </h3>
-                    <ul className="space-y-1">
-                      {quality.fehlende_scopes.map((s, i) => (
-                        <li key={i} className="text-sm text-amber-900 flex items-center gap-2">
-                          <span className="dot w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0" />
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {quality.empfehlungen.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold mb-2 text-amber-900">Empfehlungen:</h3>
-                    <ul className="space-y-1">
-                      {quality.empfehlungen.map((e, i) => (
-                        <li key={i} className="text-sm text-amber-900 flex items-center gap-2">
-                          <span className="dot w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0" />
-                          {e}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Footer (screen only) */}
-            <div className="print-footer-inline border-t border-border pt-4 flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-wider">
-              <span>CLYMAIQ ESG Platform</span>
-              <span>Powered by Claude AI · GHG Protocol · CSRD / ESRS E1</span>
+          {/* Executive Summary */}
+          <section>
+            <h2 className="section-title text-lg font-bold mb-3 text-foreground">
+              CSRD Nachhaltigkeitsbericht — ESRS E1 Klimawandel
+            </h2>
+            <div className="exec-summary bg-muted/50 rounded-lg p-4">
+              <p className="text-sm leading-relaxed text-foreground">
+                Im Berichtszeitraum {berichtszeitraum} wurden insgesamt{" "}
+                <strong>{formatTonnes(total)} t CO₂e</strong> emittiert. Davon entfallen{" "}
+                {formatTonnes(s1)} t auf Scope 1 (direkte Emissionen), {formatTonnes(s2)} t auf
+                Scope 2 (Energiebezug) und {formatTonnes(s3)} t auf Scope 3 (Wertschöpfungskette).
+                Die Datenqualität beträgt <strong>{quality.score} %</strong>.
+              </p>
             </div>
-          </div>
+          </section>
+
+          {/* GESAMTÜBERSICHT */}
+          <section>
+            <h2 className="section-title text-base font-bold mb-2">Gesamtübersicht</h2>
+            <table className="summary-table">
+              <tbody>
+                <tr>
+                  <td className="label">Scope 1 — Direkte Emissionen</td>
+                  <td className="val">{formatTonnes(s1)} t CO₂e</td>
+                </tr>
+                <tr>
+                  <td className="label">Scope 2 — Energiebedingte Emissionen</td>
+                  <td className="val">{formatTonnes(s2)} t CO₂e</td>
+                </tr>
+                <tr>
+                  <td className="label">Scope 3 — Wertschöpfungskette</td>
+                  <td className="val">{formatTonnes(s3)} t CO₂e</td>
+                </tr>
+                <tr className="total-row">
+                  <td className="label">Gesamt</td>
+                  <td className="val">{formatTonnes(total)} t CO₂e</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <ScopeSection
+            scopeKey="s1"
+            title="Scope 1: Direkte Emissionen"
+            description="Emissionen aus eigenen oder kontrollierten Quellen (Fuhrpark, Heizung, Produktion)"
+            lines={scope1Lines}
+            total={s1}
+          />
+          <ScopeSection
+            scopeKey="s2"
+            title="Scope 2: Energiebedingte Emissionen"
+            description="Emissionen aus eingekaufter Energie (Strom, Fernwärme)"
+            lines={scope2Lines}
+            total={s2}
+          />
+          <ScopeSection
+            scopeKey="s3"
+            title="Scope 3: Emissionen der Wertschöpfungskette"
+            description="Indirekte Emissionen aus vor- und nachgelagerten Aktivitäten"
+            lines={scope3Lines}
+            total={s3}
+          />
+
+          {/* Methodik */}
+          <section>
+            <div className="methodik-box">
+              <h3>Methodik</h3>
+              <p>
+                Berechnung nach GHG Protocol Corporate Standard. Methode: Spend-Based EEIO
+                (Environmentally Extended Input-Output) gemäß GHG Protocol Corporate Value Chain
+                (Scope 3) Standard. Alle Emissionen werden aus monetären SAP FI/CO Buchungsdaten
+                abgeleitet — ohne manuelle Eingabe. Emissionsfaktoren: UBA 2024, DEFRA 2024,
+                GHG Protocol EEIO.
+              </p>
+            </div>
+          </section>
+
+          {/* Datenlücken */}
+          {quality.fehlende_scopes.length > 0 && (
+            <section>
+              <div className="gaps-box">
+                <h3>Datenlücken</h3>
+                <ul>
+                  {quality.fehlende_scopes.map((s, i) => (
+                    <li key={i}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
+
+          {/* Empfehlungen */}
+          {quality.empfehlungen.length > 0 && (
+            <section>
+              <div className="reco-box">
+                <h3>Empfehlungen</h3>
+                <ul>
+                  {quality.empfehlungen.map((e, i) => (
+                    <li key={i}>{e}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </>
@@ -504,57 +362,51 @@ function ScopeSection({
   total: number;
 }) {
   return (
-    <section className="print-section">
+    <section className="avoid-break">
       <div className={`scope-header ${scopeKey}`}>
-        <div>
-          <div className="title">{title}</div>
-          <div className="desc">{description}</div>
-        </div>
-        <div className="badge">{formatTonnes(total)} t CO₂e</div>
+        <h2>{title}</h2>
+        <span className="total-badge">{formatTonnes(total)} t CO₂e</span>
       </div>
-      {/* Screen-only fallback heading kept hidden in print via scope-header above */}
+      <p className="scope-desc">{description}</p>
+
       {lines.length > 0 ? (
-        <table className="report-table w-full text-sm mb-2">
+        <table className="report-table">
           <thead>
-            <tr className="text-xs text-muted-foreground uppercase border-b border-border">
-              <th className="py-2 text-left font-medium">Kostenstelle</th>
-              <th className="py-2 text-left font-medium">Buchungstext</th>
-              <th className="num py-2 text-right font-medium">Betrag €</th>
-              <th className="py-2 text-left font-medium">Kategorie</th>
-              <th className="center py-2 text-center font-medium">Scope</th>
-              <th className="num py-2 text-right font-medium">t CO₂e</th>
-              <th className="num py-2 text-right font-medium">Faktor kg/€</th>
-              <th className="py-2 text-left font-medium">Quelle</th>
+            <tr>
+              <th>Kostenstelle</th>
+              <th>Buchungstext</th>
+              <th className="num">Betrag €</th>
+              <th>Kategorie</th>
+              <th className="center">Scope</th>
+              <th className="num">t CO₂e</th>
+              <th className="num">Faktor kg/€</th>
+              <th>Quelle</th>
             </tr>
           </thead>
           <tbody>
             {lines.map((l: any) => (
-              <tr key={l.zeile_id} className="border-b border-border/50">
-                <td className="py-2 text-xs">{l.original.kostenstelle}</td>
-                <td className="py-2 text-xs">{l.original.buchungstext}</td>
-                <td className="num py-2 text-xs text-right">{formatEuro(l.original.betrag)}</td>
-                <td className="py-2 text-xs">{l.kategorie}</td>
-                <td className="center py-2 text-xs text-center">{l.scope}</td>
-                <td className="num py-2 text-xs text-right font-medium">{formatTonnes(l.t_co2)}</td>
-                <td className="num py-2 text-xs text-right tabular-nums">
+              <tr key={l.zeile_id}>
+                <td>{l.original.kostenstelle}</td>
+                <td>{l.original.buchungstext}</td>
+                <td className="num">{formatEuro(l.original.betrag)}</td>
+                <td>{l.kategorie}</td>
+                <td className="center">{l.scope}</td>
+                <td className="num">{formatTonnes(l.t_co2)}</td>
+                <td className="num">
                   {l.emissionsfaktor.toLocaleString("de-DE", {
                     minimumFractionDigits: 5,
                     maximumFractionDigits: 5,
                   })}
                 </td>
-                <td className="py-2 text-xs text-muted-foreground">{l.quelle}</td>
+                <td>{l.quelle}</td>
               </tr>
             ))}
-          </tbody>
-          <tfoot>
-            <tr className="border-t-2 border-border">
-              <td colSpan={5} className="py-2 text-sm font-bold">
-                Summe
-              </td>
-              <td className="num py-2 text-sm font-bold text-right">{formatTonnes(total)} t</td>
+            <tr className="sum-row">
+              <td colSpan={5}>Summe</td>
+              <td className="num">{formatTonnes(total)} t</td>
               <td colSpan={2}></td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       ) : (
         <p className="text-sm text-muted-foreground italic">
