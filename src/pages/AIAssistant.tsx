@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
 import { Send, Loader2 } from "lucide-react";
-
-const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
+import { callAIChat } from "@/lib/ai-provider";
 
 type Message = { role: "user" | "assistant"; content: string };
 
