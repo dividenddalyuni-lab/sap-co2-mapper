@@ -21,7 +21,12 @@ export default function CSRDReportPage() {
   const perioden = [...new Set(bookingLines.map((b) => b.periode))];
   const berichtszeitraum = perioden.length > 0 ? `${perioden[0]} – ${perioden[perioden.length - 1]}` : "2024";
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = "Muster GmbH CSRD Report 2024";
+    window.print();
+    document.title = originalTitle;
+  };
 
   return (
     <>
