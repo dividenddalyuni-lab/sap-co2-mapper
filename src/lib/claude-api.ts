@@ -1,6 +1,5 @@
 import { BookingLine, ClaudeResponse } from "./types";
-
-const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
+import { callAIChat, AIProvider } from "./ai-provider";
 
 const buildPrompt = (lines: BookingLine[]): string => {
   const linesJson = JSON.stringify(lines.map(l => ({
@@ -45,68 +44,25 @@ Führe folgende Analysen durch:
 
 Antworte NUR mit diesem JSON, kein Text davor oder danach:
 {
-  "zeilen": [
-    {
-      "zeile_id": 0,
-      "kategorie": "...",
-      "scope": 1,
-      "scope3_kategorie": "...",
-      "emissionsfaktor": 0.380,
-      "einheit": "kWh",
-      "umrechnungsfaktor": 0.28,
-      "quelle": "UBA 2024",
-      "konfidenz": "hoch",
-      "status": "ok",
-      "begruendung": "..."
-    }
-  ],
-  "anomalien": [
-    {
-      "zeile_id": 0,
-      "typ": "hoher_betrag",
-      "nachricht": "...",
-      "empfehlung": "..."
-    }
-  ],
-  "datenqualitaet": {
-    "score": 72,
-    "fehlende_scopes": ["..."],
-    "empfehlungen": ["..."]
-  }
+  "zeilen": [...],
+  "anomalien": [...],
+  "datenqualitaet": { "score": 72, "fehlende_scopes": [...], "empfehlungen": [...] }
 }`;
 };
 
 export async function callClaudeAPI(
+  provider: AIProvider,
   apiKey: string,
   bookingLines: BookingLine[]
 ): Promise<ClaudeResponse> {
-  const response = await fetch(CLAUDE_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 4000,
-      messages: [
-        { role: "user", content: buildPrompt(bookingLines) },
-      ],
-    }),
+  const text = await callAIChat({
+    provider,
+    apiKey,
+    system: "Du bist ein CO₂-Bilanzierungsexperte. Antworte ausschließlich mit gültigem JSON.",
+    messages: [{ role: "user", content: buildPrompt(bookingLines) }],
+    maxTokens: 4000,
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Claude API Fehler (${response.status}): ${errText}`);
-  }
-
-  const data = await response.json();
-  const text: string = data.content?.[0]?.text ?? "";
-
-  // Strip markdown fences if present
   const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-
   return JSON.parse(cleaned) as ClaudeResponse;
 }
