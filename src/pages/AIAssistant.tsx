@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
 import { Send, Loader2 } from "lucide-react";
-
-const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
+import { callAIChat } from "@/lib/ai-provider";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -18,7 +17,7 @@ Du analysierst SAP FICO-Buchungsdaten eines deutschen Unternehmens (Muster GmbH,
 Antworte immer auf Deutsch, präzise und fachlich fundiert. Verwende Zahlen und konkrete Empfehlungen wo möglich.`;
 
 export default function AIAssistantPage() {
-  const { bookingLines, apiKey, calculatedLines, claudeResponse } = useApp();
+  const { bookingLines, apiKey, provider, calculatedLines, claudeResponse } = useApp();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,30 +65,14 @@ export default function AIAssistantPage() {
         allMessages[0].content = `[Kontext der aktuellen Analyse]\n${contextInfo}\n\n[Frage des Nutzers]\n${allMessages[0].content}`;
       }
 
-      const response = await fetch(CLAUDE_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 2000,
-          system: SYSTEM_PROMPT,
-          messages: allMessages,
-        }),
+      const assistantText = await callAIChat({
+        provider,
+        apiKey,
+        system: SYSTEM_PROMPT,
+        messages: allMessages,
+        maxTokens: 2000,
       });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`API Fehler (${response.status}): ${errText}`);
-      }
-
-      const data = await response.json();
-      const assistantText = data.content?.[0]?.text ?? "Keine Antwort erhalten.";
-      setMessages((prev) => [...prev, { role: "assistant", content: assistantText }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: assistantText || "Keine Antwort erhalten." }]);
     } catch (err: any) {
       setMessages((prev) => [
         ...prev,

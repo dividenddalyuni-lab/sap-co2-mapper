@@ -6,7 +6,7 @@ import { askClaudeAboutData, ChatMessage } from "@/lib/claude-chat";
 import { Send, Sparkles, Loader2, AlertTriangle } from "lucide-react";
 
 export default function AnomaliesPage() {
-  const { calculatedLines, apiKey } = useApp();
+  const { calculatedLines, apiKey, provider } = useApp();
 
   const anomalies = useMemo(() => detectAnomalies(calculatedLines), [calculatedLines]);
 
@@ -31,7 +31,7 @@ export default function AnomaliesPage() {
     setMessages(next);
     setIsAsking(true);
     try {
-      const answer = await askClaudeAboutData(apiKey, messages, q, calculatedLines);
+      const answer = await askClaudeAboutData(provider, apiKey, messages, q, calculatedLines);
       setMessages([...next, { role: "assistant", content: answer }]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unbekannter Fehler";

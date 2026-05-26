@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { BookingLine, ClaudeResponse, CalculatedLine, AppScreen } from "@/lib/types";
+import { AIProvider } from "@/lib/ai-provider";
 
 export interface AppState {
   screen: AppScreen;
@@ -10,6 +11,8 @@ export interface AppState {
   calculatedLines: CalculatedLine[];
   apiKey: string;
   setApiKey: (key: string) => void;
+  provider: AIProvider;
+  setProvider: (p: AIProvider) => void;
   isAnalyzing: boolean;
   analysisStep: string;
   startAnalysis: (useMock?: boolean) => Promise<void>;
