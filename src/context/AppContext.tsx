@@ -4,6 +4,7 @@ import { calculateEmissions } from "@/lib/co2-utils";
 import { callClaudeAPI } from "@/lib/claude-api";
 import { buildFallbackResponse } from "@/lib/fallback-classifier";
 import { AppContext, ANALYSIS_STEPS } from "./app-context-core";
+import { AIProvider } from "@/lib/ai-provider";
 
 export { useApp } from "./app-context-core";
 
@@ -12,13 +13,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [bookingLines, setBookingLines] = useState<BookingLine[]>([]);
   const [claudeResponse, setClaudeResponse] = useState<ClaudeResponse | null>(null);
   const [calculatedLines, setCalculatedLines] = useState<CalculatedLine[]>([]);
-  const [apiKey, setApiKeyState] = useState(() => localStorage.getItem("clymaiq_api_key") || "");
+  const [provider, setProviderState] = useState<AIProvider>(
+    () => ((localStorage.getItem("clymaiq_provider") as AIProvider) || "claude")
+  );
+  const [apiKey, setApiKeyState] = useState(
+    () => localStorage.getItem(`clymaiq_api_key_${provider}`) || ""
+  );
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState("");
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
-    localStorage.setItem("clymaiq_api_key", key);
+    localStorage.setItem(`clymaiq_api_key_${provider}`, key);
+  }, [provider]);
+
+  const setProvider = useCallback((p: AIProvider) => {
+    setProviderState(p);
+    localStorage.setItem("clymaiq_provider", p);
+    // Load the key stored for this provider (if any)
+    const storedKey = localStorage.getItem(`clymaiq_api_key_${p}`) || "";
+    setApiKeyState(storedKey);
   }, []);
 
   const startAnalysis = useCallback(async (useMock = false) => {
@@ -32,24 +46,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }, 1500);
 
     try {
-      // 1) Always compute emissions deterministically via Spend-Based EEIO (no API needed for math)
+      // 1) Always compute emissions deterministically via Spend-Based EEIO
       const eeio = buildFallbackResponse(bookingLines);
       let response: ClaudeResponse = eeio;
 
-      // 2) Optionally enrich anomalies + data quality via Claude (math is NOT overridden)
+      // 2) Optionally enrich anomalies + data quality via AI provider
       if (!useMock && apiKey) {
         try {
-          const ai = await callClaudeAPI(apiKey, bookingLines);
+          const ai = await callClaudeAPI(provider, apiKey, bookingLines);
           response = {
-            zeilen: eeio.zeilen, // keep deterministic EEIO classification + factors
+            zeilen: eeio.zeilen,
             anomalien: ai.anomalien?.length ? ai.anomalien : eeio.anomalien,
             datenqualitaet: ai.datenqualitaet ?? eeio.datenqualitaet,
           };
         } catch (apiErr) {
-          console.warn("Claude API failed — using EEIO-only result:", apiErr);
+          console.warn("AI provider failed — using EEIO-only result:", apiErr);
         }
       } else {
-        // Simulate analysis steps for the mock/no-key path
         await new Promise((r) => setTimeout(r, ANALYSIS_STEPS.length * 1500));
       }
 
@@ -66,7 +79,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       clearInterval(stepInterval);
       setIsAnalyzing(false);
     }
-  }, [apiKey, bookingLines]);
+  }, [apiKey, provider, bookingLines]);
 
   const resetAnalysis = useCallback(() => {
     setScreen("upload");
@@ -81,6 +94,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       bookingLines, setBookingLines,
       claudeResponse, calculatedLines,
       apiKey, setApiKey,
+      provider, setProvider,
       isAnalyzing, analysisStep,
       startAnalysis, resetAnalysis,
     }}>
