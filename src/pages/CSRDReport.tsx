@@ -29,14 +29,31 @@ export default function CSRDReportPage() {
   });
 
   const handlePrint = () => {
-    const prevTitle = document.title;
-    document.title = "Muster GmbH CSRD Report 2024";
-    window.setTimeout(() => {
-      window.print();
-      window.setTimeout(() => {
-        document.title = prevTitle;
-      }, 1000);
-    }, 100);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+
+    const reportHTML = document.getElementById("csrd-report-content")?.innerHTML;
+    const printCSS = document.querySelector("style[data-csrd-print-styles]")?.textContent ?? "";
+
+    iframe.contentDocument?.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Muster GmbH CSRD Report 2024</title>
+          <style>${printCSS}</style>
+        </head>
+        <body>${reportHTML ?? ""}</body>
+      </html>
+    `);
+
+    iframe.contentDocument?.close();
+    iframe.contentWindow?.focus();
+    iframe.contentWindow?.print();
+
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -50,7 +67,7 @@ export default function CSRDReportPage() {
   return (
     <>
       {/* Print-only styles for auditor-grade PDF */}
-      <style>{`
+      <style data-csrd-print-styles>{`
         @media print {
           @page {
             size: A4;
@@ -321,7 +338,7 @@ export default function CSRDReportPage() {
         </div>
 
         {/* Report */}
-        <div className="report-shell bg-card rounded-xl border border-border max-w-4xl mx-auto print:border-none print:shadow-none">
+        <div id="csrd-report-content" className="report-shell bg-card rounded-xl border border-border max-w-4xl mx-auto print:border-none print:shadow-none">
           {/* Print-only cover page */}
           <div className="print-cover">
             <div className="print-cover-header">
