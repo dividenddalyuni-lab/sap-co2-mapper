@@ -6,7 +6,7 @@ import { askClaudeAboutData, ChatMessage } from "@/lib/claude-chat";
 import { Send, Sparkles, Loader2, AlertTriangle } from "lucide-react";
 
 export default function AnomaliesPage() {
-  const { calculatedLines, apiKey } = useApp();
+  const { calculatedLines, apiKey, provider } = useApp();
 
   const anomalies = useMemo(() => detectAnomalies(calculatedLines), [calculatedLines]);
 
