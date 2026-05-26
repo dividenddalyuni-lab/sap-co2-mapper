@@ -28,6 +28,12 @@ export default function CSRDReportPage() {
     document.title = originalTitle;
   };
 
+  useEffect(() => {
+    const originalTitle = document.title;
+    document.title = "CSRD Report — Muster GmbH";
+    return () => { document.title = originalTitle; };
+  }, []);
+
   return (
     <>
       <div className="p-6 space-y-6">
