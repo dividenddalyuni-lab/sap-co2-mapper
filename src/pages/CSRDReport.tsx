@@ -1,6 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { formatTonnes, scopeTotal, formatEuro } from "@/lib/co2-utils";
 import { FileText, RotateCcw } from "lucide-react";
+import { useEffect } from "react";
 
 export default function CSRDReportPage() {
   const { calculatedLines, claudeResponse, resetAnalysis, bookingLines } = useApp();
