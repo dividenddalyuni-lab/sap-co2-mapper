@@ -22,10 +22,14 @@ export default function CSRDReportPage() {
   const berichtszeitraum = perioden.length > 0 ? `${perioden[0]} – ${perioden[perioden.length - 1]}` : "2024";
 
   const handlePrint = () => {
-    const originalTitle = document.title;
+    const prevTitle = document.title;
     document.title = "Muster GmbH CSRD Report 2024";
-    window.print();
-    document.title = originalTitle;
+    window.setTimeout(() => {
+      window.print();
+      window.setTimeout(() => {
+        document.title = prevTitle;
+      }, 500);
+    }, 100);
   };
 
   useEffect(() => {
