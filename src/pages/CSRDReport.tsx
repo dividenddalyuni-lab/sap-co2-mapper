@@ -1,6 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { formatTonnes, scopeTotal, formatEuro } from "@/lib/co2-utils";
 import { FileText, RotateCcw } from "lucide-react";
+import { useEffect } from "react";
 
 export default function CSRDReportPage() {
   const { calculatedLines, claudeResponse, resetAnalysis, bookingLines } = useApp();
@@ -20,7 +21,18 @@ export default function CSRDReportPage() {
   const perioden = [...new Set(bookingLines.map((b) => b.periode))];
   const berichtszeitraum = perioden.length > 0 ? `${perioden[0]} – ${perioden[perioden.length - 1]}` : "2024";
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = "Muster GmbH CSRD Report 2024";
+    window.print();
+    document.title = originalTitle;
+  };
+
+  useEffect(() => {
+    const originalTitle = document.title;
+    document.title = "CSRD Report — Muster GmbH";
+    return () => { document.title = originalTitle; };
+  }, []);
 
   return (
     <>
