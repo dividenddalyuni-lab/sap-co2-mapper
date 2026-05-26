@@ -17,7 +17,7 @@ Du analysierst SAP FICO-Buchungsdaten eines deutschen Unternehmens (Muster GmbH,
 Antworte immer auf Deutsch, präzise und fachlich fundiert. Verwende Zahlen und konkrete Empfehlungen wo möglich.`;
 
 export default function AIAssistantPage() {
-  const { bookingLines, apiKey, calculatedLines, claudeResponse } = useApp();
+  const { bookingLines, apiKey, provider, calculatedLines, claudeResponse } = useApp();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
