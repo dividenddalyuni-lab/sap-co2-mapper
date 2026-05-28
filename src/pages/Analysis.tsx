@@ -36,15 +36,14 @@ export default function AnalysisPage() {
             </defs>
             {/* Base infinity stroke (dark green) */}
             <path
-              id="infinityPath"
-              d="M 25 25 C 25 8 8 8 8 25 C 8 42 25 42 25 25 C 25 8 42 8 42 25 C 42 42 25 42 25 25 M 50 25 C 50 8 67 8 67 25 C 67 42 50 42 50 25 C 50 8 33 8 33 25 C 33 42 50 42 50 25"
+              d="M 50 25 C 50 5 8 5 8 25 C 8 45 50 45 50 25 C 50 5 92 5 92 25 C 92 45 50 45 50 25"
               stroke="hsl(155 50% 25%)"
               strokeWidth="2.5"
               strokeLinecap="round"
             />
-            {/* Single continuous figure-8 path for the energy trail */}
+            {/* Energy trail flowing along the exact same figure-8 */}
             <path
-              d="M 8 25 C 8 8 25 8 25 25 C 25 42 42 42 42 25 C 42 8 58 8 58 25 C 58 42 75 42 75 25 C 75 8 58 8 58 25 C 58 42 42 42 42 25 C 42 8 25 8 25 25 C 25 42 8 42 8 25"
+              d="M 50 25 C 50 5 8 5 8 25 C 8 45 50 45 50 25 C 50 5 92 5 92 25 C 92 45 50 45 50 25"
               stroke="url(#energyTrail)"
               strokeWidth="2.8"
               strokeLinecap="round"
