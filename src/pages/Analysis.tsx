@@ -17,12 +17,42 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-screen bg-[hsl(155,35%,10%)] flex items-center justify-center">
       <div className="text-center space-y-8 max-w-md w-full px-8">
-        <div className="relative mx-auto w-[320px] overflow-hidden rounded-xl bg-white/95 px-4 py-3">
+        <div className="relative mx-auto w-[320px] rounded-xl bg-white/95 px-4 py-3">
           <img src={clymaiqLogo} alt="CLYMAIQ ESG Platform" className="w-full h-auto object-contain relative z-0" />
-          {/* Light sweep moving in one direction across the logo */}
-          <div className="pointer-events-none absolute inset-0 z-10 animate-logo-sweep">
-            <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-primary/50 to-transparent blur-md" />
-          </div>
+          {/* Energy stream flowing along the infinity curve of the icon */}
+          <svg
+            className="pointer-events-none absolute z-10"
+            style={{ left: "5%", top: "18%", width: "22%", height: "64%" }}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <defs>
+              <linearGradient id="energyTrail" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+                <stop offset="55%" stopColor="hsl(var(--primary))" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
+              </linearGradient>
+              <filter id="energyGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2.2" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {/* Tilted infinity path, traversed from bottom-left to top-right */}
+            <path
+              d="M 18 82 C 30 82 32 58 50 50 C 68 42 70 18 82 18"
+              stroke="url(#energyTrail)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              filter="url(#energyGlow)"
+              pathLength={100}
+              strokeDasharray="22 100"
+              className="animate-energy-flow"
+            />
+          </svg>
         </div>
 
         <p className="text-white/50 text-sm">KI-Analyse läuft</p>

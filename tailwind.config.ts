@@ -92,6 +92,10 @@ export default {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(300%)" },
         },
+        "energy-flow": {
+          "0%": { strokeDashoffset: "122" },
+          "100%": { strokeDashoffset: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -99,6 +103,7 @@ export default {
         "pulse-green": "pulse-green 2s ease-in-out infinite",
         "logo-drift": "logo-drift 2.4s ease-in-out infinite",
         "logo-sweep": "logo-sweep 2.2s linear infinite",
+        "energy-flow": "energy-flow 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite",
       },
     },
   },
