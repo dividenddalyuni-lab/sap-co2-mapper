@@ -37,12 +37,8 @@ export default function Sidebar() {
   return (
     <aside className="w-56 min-h-screen bg-sidebar flex flex-col shrink-0">
       {/* Logo */}
-      <div className="px-5 py-6 flex items-center gap-3">
-        <img src={clymaiqMark} alt="CLYMAIQ" className="w-10 h-10 object-contain shrink-0" />
-        <div className="leading-tight">
-          <div className="text-sidebar-foreground font-bold text-base tracking-wide">CLYMAIQ</div>
-          <div className="text-[10px] text-sidebar-muted tracking-widest uppercase">ESG Platform</div>
-        </div>
+      <div className="bg-white px-3 py-4 flex items-center justify-center">
+        <img src={clymaiqLogo} alt="CLYMAIQ ESG Platform" className="w-full h-auto object-contain" />
       </div>
 
       {/* Navigation */}
