@@ -17,42 +17,47 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-screen bg-[hsl(155,35%,10%)] flex items-center justify-center">
       <div className="text-center space-y-8 max-w-md w-full px-8">
-        <div className="relative mx-auto w-[320px] rounded-xl bg-white/95 px-4 py-3">
-          <img src={clymaiqLogo} alt="CLYMAIQ ESG Platform" className="w-full h-auto object-contain relative z-0" />
-          {/* Energy stream flowing along the infinity curve of the icon */}
-          <svg
-            className="pointer-events-none absolute z-10"
-            style={{ left: "5.5%", top: "15%", width: "36%", height: "67%" }}
-            viewBox="0 0 200 100"
-            preserveAspectRatio="none"
-            fill="none"
-          >
+        <div className="relative mx-auto rounded-xl bg-white/95 px-5 py-4 inline-flex items-center gap-3">
+          {/* Custom inline infinity icon with energy stream tracing the exact path */}
+          <svg viewBox="0 0 100 50" className="w-[68px] h-[34px]" fill="none">
             <defs>
               <linearGradient id="energyTrail" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-                <stop offset="55%" stopColor="hsl(var(--primary))" stopOpacity="0.9" />
+                <stop offset="0%" stopColor="hsl(155 65% 35%)" stopOpacity="0" />
+                <stop offset="55%" stopColor="hsl(155 75% 45%)" stopOpacity="1" />
                 <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
               </linearGradient>
               <filter id="energyGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="2.2" result="blur" />
+                <feGaussianBlur stdDeviation="1.2" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
             </defs>
-            {/* Full infinity / figure-8 path traversing both loops */}
+            {/* Base infinity stroke (dark green) */}
             <path
-              d="M 50 50 C 50 18 18 18 18 50 C 18 82 50 82 50 50 C 50 18 82 18 82 50 C 82 82 50 82 50 50"
+              id="infinityPath"
+              d="M 25 25 C 25 8 8 8 8 25 C 8 42 25 42 25 25 C 25 8 42 8 42 25 C 42 42 25 42 25 25 M 50 25 C 50 8 67 8 67 25 C 67 42 50 42 50 25 C 50 8 33 8 33 25 C 33 42 50 42 50 25"
+              stroke="hsl(155 50% 25%)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            {/* Single continuous figure-8 path for the energy trail */}
+            <path
+              d="M 8 25 C 8 8 25 8 25 25 C 25 42 42 42 42 25 C 42 8 58 8 58 25 C 58 42 75 42 75 25 C 75 8 58 8 58 25 C 58 42 42 42 42 25 C 42 8 25 8 25 25 C 25 42 8 42 8 25"
               stroke="url(#energyTrail)"
-              strokeWidth="3"
+              strokeWidth="2.8"
               strokeLinecap="round"
               filter="url(#energyGlow)"
               pathLength={100}
-              strokeDasharray="18 100"
+              strokeDasharray="14 100"
               className="animate-energy-flow"
             />
           </svg>
+          <div className="flex flex-col leading-none text-left">
+            <span className="text-[22px] font-bold tracking-wide text-[hsl(155,40%,15%)]">CLYMA<span className="font-extrabold">IQ</span></span>
+            <span className="text-[11px] text-[hsl(155,15%,35%)] tracking-wide">ESG Platform</span>
+          </div>
         </div>
 
         <p className="text-white/50 text-sm">KI-Analyse läuft</p>
