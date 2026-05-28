@@ -63,7 +63,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           console.warn("AI provider failed — using EEIO-only result:", apiErr);
         }
       } else {
-        await new Promise((r) => setTimeout(r, ANALYSIS_STEPS.length * 1500));
+        await new Promise((r) => setTimeout(r, ANALYSIS_STEPS.length * 750));
       }
 
       setClaudeResponse(response);
