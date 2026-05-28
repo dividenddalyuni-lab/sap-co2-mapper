@@ -17,7 +17,7 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-screen bg-[hsl(155,35%,10%)] flex items-center justify-center">
       <div className="text-center space-y-8 max-w-md w-full px-8">
-        <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto animate-pulse-green">
+        <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto animate-logo-drift">
           <Leaf className="w-10 h-10 text-primary" />
         </div>
 
