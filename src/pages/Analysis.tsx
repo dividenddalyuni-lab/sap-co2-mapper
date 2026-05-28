@@ -11,7 +11,7 @@ export default function AnalysisPage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress((p) => Math.min(p + 4, 95));
+      setProgress((p) => Math.min(p + 10, 95));
     }, 200);
     return () => clearInterval(interval);
   }, []);
