@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { Leaf, LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles } from "lucide-react";
+import { LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles } from "lucide-react";
+import clymaiqLogo from "@/assets/clymaiq-logo.png";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 import { AppScreen } from "@/lib/types";
@@ -36,14 +37,8 @@ export default function Sidebar() {
   return (
     <aside className="w-56 min-h-screen bg-sidebar flex flex-col shrink-0">
       {/* Logo */}
-      <div className="px-5 py-6 flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-          <Leaf className="w-5 h-5 text-primary" />
-        </div>
-        <div>
-          <div className="text-sidebar-foreground font-bold text-sm tracking-wide">CLYMAIQ</div>
-          <div className="text-[10px] text-sidebar-muted tracking-widest uppercase">ESG Platform</div>
-        </div>
+      <div className="px-4 py-5 flex items-center justify-center bg-white/95">
+        <img src={clymaiqLogo} alt="CLYMAIQ ESG Platform" className="w-full h-auto max-h-16 object-contain" />
       </div>
 
       {/* Navigation */}
