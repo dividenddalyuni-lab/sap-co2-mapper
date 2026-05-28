@@ -37,7 +37,7 @@ export default function Sidebar() {
   return (
     <aside className="w-56 min-h-screen bg-sidebar flex flex-col shrink-0">
       {/* Logo */}
-      <div className="bg-white px-3 py-4 flex items-center justify-center">
+      <div className="px-4 py-5 flex items-center justify-center">
         <img src={clymaiqLogo} alt="CLYMAIQ ESG Platform" className="w-full h-auto object-contain" />
       </div>
 
