@@ -43,7 +43,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const stepInterval = setInterval(() => {
       setAnalysisStep(ANALYSIS_STEPS[stepIndex % ANALYSIS_STEPS.length]);
       stepIndex++;
-    }, 1500);
+    }, 750);
 
     try {
       // 1) Always compute emissions deterministically via Spend-Based EEIO
