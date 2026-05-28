@@ -1,7 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
-import clymaiqLogo from "@/assets/clymaiq-logo-full.png";
+
 
 export default function AnalysisPage() {
   const { analysisStep } = useApp();
