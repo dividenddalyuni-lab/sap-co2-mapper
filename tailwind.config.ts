@@ -98,6 +98,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-green": "pulse-green 2s ease-in-out infinite",
         "logo-drift": "logo-drift 2.4s ease-in-out infinite",
+        "logo-sweep": "logo-sweep 2.2s linear infinite",
       },
     },
   },
