@@ -22,13 +22,13 @@ export default function AnalysisPage() {
           {/* Energy stream flowing along the infinity curve of the icon */}
           <svg
             className="pointer-events-none absolute z-10"
-            style={{ left: "5%", top: "18%", width: "22%", height: "64%" }}
-            viewBox="0 0 100 100"
+            style={{ left: "5%", top: "18%", width: "40%", height: "64%" }}
+            viewBox="0 0 200 100"
             preserveAspectRatio="none"
             fill="none"
           >
             <defs>
-              <linearGradient id="energyTrail" x1="0%" y1="100%" x2="100%" y2="0%">
+              <linearGradient id="energyTrail" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0" />
                 <stop offset="55%" stopColor="hsl(var(--primary))" stopOpacity="0.9" />
                 <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
@@ -41,15 +41,15 @@ export default function AnalysisPage() {
                 </feMerge>
               </filter>
             </defs>
-            {/* Tilted infinity path, traversed from bottom-left to top-right */}
+            {/* Full infinity / figure-8 path traversing both loops */}
             <path
-              d="M 18 82 C 30 82 32 58 50 50 C 68 42 70 18 82 18"
+              d="M 50 50 C 50 18 18 18 18 50 C 18 82 50 82 50 50 C 50 18 82 18 82 50 C 82 82 50 82 50 50"
               stroke="url(#energyTrail)"
               strokeWidth="3"
               strokeLinecap="round"
               filter="url(#energyGlow)"
               pathLength={100}
-              strokeDasharray="22 100"
+              strokeDasharray="18 100"
               className="animate-energy-flow"
             />
           </svg>
