@@ -74,9 +74,14 @@ export default function AIAssistantPage() {
       });
       setMessages((prev) => [...prev, { role: "assistant", content: assistantText || "Keine Antwort erhalten." }]);
     } catch (err: any) {
+      const msg = String(err?.message ?? "");
+      const isAuth = /401|invalid.*api.?key|authentication/i.test(msg);
+      const friendly = isAuth
+        ? `⚠️ Ihr ${provider === "claude" ? "Claude" : "Mistral"} API-Key ist ungültig oder abgelaufen.\n\nBitte aktualisieren Sie ihn über das Zahnrad-Symbol auf der Datenimport-Seite.\n\nSie können bis dahin die Demo-Daten im Dashboard und CSRD-Report einsehen.`
+        : `❌ Fehler bei der KI-Anfrage:\n${msg}`;
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: `❌ Fehler: ${err.message}` },
+        { role: "assistant", content: friendly },
       ]);
     } finally {
       setIsLoading(false);
