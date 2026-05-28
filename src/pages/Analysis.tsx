@@ -22,7 +22,7 @@ export default function AnalysisPage() {
           {/* Energy stream flowing along the infinity curve of the icon */}
           <svg
             className="pointer-events-none absolute z-10"
-            style={{ left: "5%", top: "18%", width: "40%", height: "64%" }}
+            style={{ left: "5.5%", top: "15%", width: "36%", height: "67%" }}
             viewBox="0 0 200 100"
             preserveAspectRatio="none"
             fill="none"
