@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { Leaf, LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles } from "lucide-react";
+import { LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles } from "lucide-react";
+import clymaiqLogo from "@/assets/clymaiq-logo.png";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 import { AppScreen } from "@/lib/types";
