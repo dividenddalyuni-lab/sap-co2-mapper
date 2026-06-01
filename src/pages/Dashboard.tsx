@@ -171,15 +171,12 @@ export default function DashboardPage() {
   const monthlyData = buildMonthlyData(calculatedLines);
   const dropHint = detectDrop(monthlyData);
 
-  const realAnomalies = (claudeResponse.anomalien || []).slice(0, 3).map((a) => {
-    const line = bookingLines.find((b) => b.id === a.zeile_id);
-    return {
-      title: line?.buchungstext || humanizeAnomalyType(a.typ),
-      detail: line ? `${line.periode} · ${line.kostenstelle}` : a.nachricht,
-      badge: humanizeAnomalyType(a.typ),
-      badgeColor: "text-destructive",
-    };
-  });
+  const realAnomalies = detectAnomalies(calculatedLines).slice(0, 3).map((a) => ({
+    title: a.buchungstext || humanizeAnomalyType(a.typ),
+    detail: `${a.typ} · ${a.periode} · KST ${a.kostenstelle}`,
+    badge: a.status,
+    badgeColor: statusBadgeClasses(a.status),
+  }));
 
   // Dynamic Y-axis: 120% of max monthly value
   const monthlyMax = monthlyData.reduce((m, d) => Math.max(m, d.value), 0);
