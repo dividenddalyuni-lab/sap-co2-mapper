@@ -360,7 +360,7 @@ export default function DashboardPage() {
                     <p className="text-sm font-semibold text-foreground">{a.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{a.detail}</p>
                   </div>
-                  <span className={`shrink-0 text-xs font-semibold ${a.badgeColor}`}>{a.badge}</span>
+                  <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold border ${a.badgeColor}`}>{a.badge}</span>
                 </div>
               ))}
             </div>
