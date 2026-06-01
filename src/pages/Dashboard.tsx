@@ -359,10 +359,9 @@ export default function DashboardPage() {
                 <div key={i} className="flex items-start justify-between pb-3 border-b border-border last:border-0">
                   <div>
                     <p className="text-sm font-semibold text-foreground">{a.title}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-primary/30 bg-primary/10 text-primary">{a.typ}</span>
                     <p className="text-xs text-muted-foreground mt-1">{a.detail}</p>
                   </div>
-                  <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold border ${a.badgeColor}`}>{a.badge}</span>
+                  <span className="shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold border border-primary/30 bg-primary/10 text-primary">{a.typ}</span>
                 </div>
               ))}
             </div>
