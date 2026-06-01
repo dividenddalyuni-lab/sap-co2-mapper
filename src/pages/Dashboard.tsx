@@ -4,6 +4,7 @@ import { AlertTriangle, ArrowDown, Upload as UploadIcon } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from "recharts";
 import type { CalculatedLine } from "@/lib/types";
 import { computeSavings } from "@/lib/savings";
+import { detectAnomalies, statusBadgeClasses } from "@/lib/anomaly-detection";
 
 const SCOPE_COLORS = ["hsl(152, 60%, 36%)", "hsl(38, 92%, 50%)", "hsl(220, 60%, 55%)"];
 
@@ -170,15 +171,12 @@ export default function DashboardPage() {
   const monthlyData = buildMonthlyData(calculatedLines);
   const dropHint = detectDrop(monthlyData);
 
-  const realAnomalies = (claudeResponse.anomalien || []).slice(0, 3).map((a) => {
-    const line = bookingLines.find((b) => b.id === a.zeile_id);
-    return {
-      title: line?.buchungstext || humanizeAnomalyType(a.typ),
-      detail: line ? `${line.periode} · ${line.kostenstelle}` : a.nachricht,
-      badge: humanizeAnomalyType(a.typ),
-      badgeColor: "text-destructive",
-    };
-  });
+  const realAnomalies = detectAnomalies(calculatedLines).slice(0, 3).map((a) => ({
+    title: a.buchungstext || humanizeAnomalyType(a.typ),
+    detail: `${a.typ} · ${a.periode} · KST ${a.kostenstelle}`,
+    badge: a.status,
+    badgeColor: statusBadgeClasses(a.status),
+  }));
 
   // Dynamic Y-axis: 120% of max monthly value
   const monthlyMax = monthlyData.reduce((m, d) => Math.max(m, d.value), 0);
@@ -362,7 +360,7 @@ export default function DashboardPage() {
                     <p className="text-sm font-semibold text-foreground">{a.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{a.detail}</p>
                   </div>
-                  <span className={`shrink-0 text-xs font-semibold ${a.badgeColor}`}>{a.badge}</span>
+                  <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold border ${a.badgeColor}`}>{a.badge}</span>
                 </div>
               ))}
             </div>
