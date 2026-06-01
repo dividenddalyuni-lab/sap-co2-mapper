@@ -66,8 +66,6 @@ export default function AnalysisPage() {
         </div>
 
         <div className="flex items-center justify-center gap-3 pt-4">
-          <span className="text-[10px] text-white/30 uppercase tracking-wider">Claude AI</span>
-          <span className="text-white/10">•</span>
           <span className="text-[10px] text-white/30 uppercase tracking-wider">GHG Protocol</span>
         </div>
       </div>
