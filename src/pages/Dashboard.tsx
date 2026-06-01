@@ -173,7 +173,8 @@ export default function DashboardPage() {
 
   const realAnomalies = detectAnomalies(calculatedLines).slice(0, 3).map((a) => ({
     title: a.buchungstext || humanizeAnomalyType(a.typ),
-    detail: `${a.typ} · ${a.periode} · KST ${a.kostenstelle}`,
+    typ: a.typ,
+    detail: `${a.periode} · KST ${a.kostenstelle}`,
     badge: a.status,
     badgeColor: statusBadgeClasses(a.status),
   }));
