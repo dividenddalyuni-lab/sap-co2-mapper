@@ -449,20 +449,20 @@ export default function SupplierChatPage() {
       estimatedBookingLines: syntheticLines,
     };
 
-    // Session sicherstellen
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
-      const { error: signInError } = await supabase.auth.signInAnonymously();
-      console.log("Anonymous sign-in:", signInError ?? "ok");
-    }
+    if (supabase) {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        const { error: signInError } = await supabase.auth.signInAnonymously();
+        console.log("Anonymous sign-in:", signInError ?? "ok");
+      }
 
-    // In Supabase speichern
-    const { data, error } = await supabase.from("supplier_sessions").insert({
-      answers: finalAnswers,
-      estimated_booking_lines: syntheticLines ?? null,
-      completed_at: session.completedAt,
-    });
-    console.log("Supabase insert result:", { data, error });
+      const { data, error } = await supabase.from("supplier_sessions").insert({
+        answers: finalAnswers,
+        estimated_booking_lines: syntheticLines ?? null,
+        completed_at: session.completedAt,
+      });
+      console.log("Supabase insert result:", { data, error });
+    }
 
     setSupplierSession(session);
     setScreen("dashboard");
