@@ -47,7 +47,7 @@ export interface CalculatedLine extends ClassifiedLine {
   t_co2: number;
 }
 
-export type AppScreen = "upload" | "analysis" | "dashboard" | "csrd-report" | "anomalies" | "ai-assistant" | "savings" | "supplier-chat";
+export type AppScreen = "upload" | "analysis" | "dashboard" | "csrd-report" | "anomalies" | "ai-assistant" | "savings" | "supplier-chat" | "kalender";
 
 export interface SupplierFile {
   name: string;

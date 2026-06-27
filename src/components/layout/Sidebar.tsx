@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles, MessageSquare } from "lucide-react";
+import { LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles, MessageSquare, CalendarDays } from "lucide-react";
 import clymaiqLogo from "@/assets/clymaiq-logo-full.png";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,7 @@ const navSections = [
     label: "ADMINISTRATION",
     items: [
       { id: "upload" as AppScreen, label: "Datenquellen", icon: Database },
+      { id: "kalender" as AppScreen, label: "Kalender", icon: CalendarDays },
     ],
   },
 ];

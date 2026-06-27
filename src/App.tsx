@@ -12,6 +12,7 @@ import AnomaliesPage from "@/pages/Anomalies";
 import AIAssistantPage from "@/pages/AIAssistant";
 import SavingsPage from "@/pages/Savings";
 import SupplierChatPage from "@/pages/SupplierChat";
+import KalenderPage from "@/pages/Kalender";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ function ScreenRouter() {
       {screen === "ai-assistant" && <AIAssistantPage />}
       {screen === "savings" && <SavingsPage />}
       {screen === "supplier-chat" && <SupplierChatPage />}
+      {screen === "kalender" && <KalenderPage />}
     </AppLayout>
   );
 }
