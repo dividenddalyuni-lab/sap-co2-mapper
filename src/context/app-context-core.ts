@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { BookingLine, ClaudeResponse, CalculatedLine, AppScreen } from "@/lib/types";
+import { BookingLine, ClaudeResponse, CalculatedLine, AppScreen, SupplierSession } from "@/lib/types";
 import { AIProvider } from "@/lib/ai-provider";
 
 export interface AppState {
@@ -17,6 +17,8 @@ export interface AppState {
   analysisStep: string;
   startAnalysis: (useMock?: boolean) => Promise<void>;
   resetAnalysis: () => void;
+  supplierSession: SupplierSession | null;
+  setSupplierSession: (s: SupplierSession | null) => void;
 }
 
 export const AppContext = createContext<AppState | null>(null);

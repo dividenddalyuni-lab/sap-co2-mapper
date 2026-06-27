@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { BookingLine, ClaudeResponse, CalculatedLine, AppScreen } from "@/lib/types";
+import { BookingLine, ClaudeResponse, CalculatedLine, AppScreen, SupplierSession } from "@/lib/types";
 import { calculateEmissions } from "@/lib/co2-utils";
 import { callClaudeAPI } from "@/lib/claude-api";
 import { buildFallbackResponse } from "@/lib/fallback-classifier";
@@ -21,6 +21,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState("");
+  const [supplierSession, setSupplierSession] = useState<SupplierSession | null>(null);
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
@@ -97,6 +98,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       provider, setProvider,
       isAnalyzing, analysisStep,
       startAnalysis, resetAnalysis,
+      supplierSession, setSupplierSession,
     }}>
       {children}
     </AppContext.Provider>

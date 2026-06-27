@@ -47,4 +47,56 @@ export interface CalculatedLine extends ClassifiedLine {
   t_co2: number;
 }
 
-export type AppScreen = "upload" | "analysis" | "dashboard" | "csrd-report" | "anomalies" | "ai-assistant" | "savings";
+export type AppScreen = "upload" | "analysis" | "dashboard" | "csrd-report" | "anomalies" | "ai-assistant" | "savings" | "supplier-chat";
+
+export interface SupplierFile {
+  name: string;
+  type: string;
+  size: number;
+  uploadedAt: string;
+  // blob URL for local preview; replace with server URL when backend is ready
+  localUrl?: string;
+  // placeholder for future backend upload
+  serverUrl?: string;
+}
+
+export interface SupplierAnswers {
+  // A — Unternehmen
+  firmenname?: string;
+  branche?: string;
+  mitarbeiter?: string;
+  berichtsjahr?: string;
+  jahresumsatz?: string;
+  // B — Bestehende Bilanz
+  hatBilanz?: "ja" | "nein";
+  gesamtemissionen?: string;
+  bilanzStandard?: string;
+  scope1?: string;
+  scope2?: string;
+  scope3?: string;
+  bilanzDokument?: SupplierFile;
+  // C — Energie
+  stromverbrauch?: string;
+  oekostromAnteil?: string;
+  heizung?: string;
+  kraftstoff?: string;
+  // D — Scope 3
+  materialeinkauf?: string;
+  dienstreisen?: string;
+  // E — PCF
+  hatPcf?: "ja" | "nein";
+  pcfWert?: string;
+  pcfDokument?: SupplierFile;
+  // F — Qualität & Ziele
+  datenqualitaet?: string;
+  klimaziele?: string;
+  // Extra docs
+  weitereNachweise?: SupplierFile[];
+}
+
+export interface SupplierSession {
+  answers: SupplierAnswers;
+  completedAt?: string;
+  // EEIO-estimated lines (populated when no finished Bilanz provided)
+  estimatedBookingLines?: BookingLine[];
+}

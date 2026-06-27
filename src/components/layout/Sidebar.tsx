@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles } from "lucide-react";
+import { LayoutDashboard, FileText, BarChart3, Diamond, Database, Sparkles, MessageSquare } from "lucide-react";
 import clymaiqLogo from "@/assets/clymaiq-logo-full.png";
 import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,12 @@ const navSections = [
     items: [
       { id: "csrd-report" as AppScreen, label: "CSRD Report", icon: FileText },
       { id: "ai-assistant" as AppScreen, label: "KI-Assistent", icon: Diamond },
+    ],
+  },
+  {
+    label: "ERFASSUNG",
+    items: [
+      { id: "supplier-chat" as AppScreen, label: "Kunden-Chat", icon: MessageSquare },
     ],
   },
   {

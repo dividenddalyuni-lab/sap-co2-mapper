@@ -11,6 +11,7 @@ import CSRDReportPage from "@/pages/CSRDReport";
 import AnomaliesPage from "@/pages/Anomalies";
 import AIAssistantPage from "@/pages/AIAssistant";
 import SavingsPage from "@/pages/Savings";
+import SupplierChatPage from "@/pages/SupplierChat";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ function ScreenRouter() {
       {screen === "anomalies" && <AnomaliesPage />}
       {screen === "ai-assistant" && <AIAssistantPage />}
       {screen === "savings" && <SavingsPage />}
+      {screen === "supplier-chat" && <SupplierChatPage />}
     </AppLayout>
   );
 }
