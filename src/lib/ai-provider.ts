@@ -1,7 +1,7 @@
-// Unified AI provider abstraction — supports Claude (Anthropic) and Mistral.
-// Both providers exchange chat messages; we normalize the request/response shape.
+// Unified AI provider abstraction — supports Claude (Anthropic), Mistral and Qwen.
+// All providers exchange chat messages; we normalize the request/response shape.
 
-export type AIProvider = "claude" | "mistral";
+export type AIProvider = "claude" | "mistral" | "qwen";
 
 export interface AIMessage {
   role: "user" | "assistant";
@@ -24,7 +24,7 @@ export const PROVIDERS: Record<AIProvider, ProviderConfig> = {
     keyPrefixHint: "Beginnt mit sk-ant-",
     consoleUrl: "https://console.anthropic.com/",
     consoleLabel: "console.anthropic.com",
-    defaultModel: "claude-sonnet-4-20250514",
+    defaultModel: "claude-sonnet-4-5",
   },
   mistral: {
     label: "Mistral AI",
@@ -33,6 +33,14 @@ export const PROVIDERS: Record<AIProvider, ProviderConfig> = {
     consoleUrl: "https://console.mistral.ai/",
     consoleLabel: "console.mistral.ai",
     defaultModel: "mistral-large-latest",
+  },
+  qwen: {
+    label: "Qwen (Alibaba Cloud)",
+    keyPlaceholder: "sk-...",
+    keyPrefixHint: "API Key aus Ihrem Alibaba Cloud Model Studio Konto",
+    consoleUrl: "https://bailian.console.alibabacloud.com/",
+    consoleLabel: "bailian.console.alibabacloud.com",
+    defaultModel: "qwen-plus",
   },
 };
 
@@ -73,6 +81,34 @@ export async function callAIChat(opts: {
     }
     const data = await response.json();
     return (data.content?.[0]?.text ?? "").trim();
+  }
+
+  if (provider === "qwen") {
+    // Qwen — OpenAI-compatible chat completions via Alibaba Cloud Model Studio
+    const response = await fetch(
+      "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: maxTokens,
+          messages: [
+            { role: "system", content: system },
+            ...messages,
+          ],
+        }),
+      }
+    );
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Qwen API Fehler (${response.status}): ${errText}`);
+    }
+    const data = await response.json();
+    return (data.choices?.[0]?.message?.content ?? "").trim();
   }
 
   // Mistral — OpenAI-compatible chat completions

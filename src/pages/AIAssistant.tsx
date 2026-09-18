@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
 import { Send, Loader2 } from "lucide-react";
-import { callAIChat } from "@/lib/ai-provider";
+import { callAIChat, PROVIDERS } from "@/lib/ai-provider";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -77,7 +77,7 @@ export default function AIAssistantPage() {
       const msg = String(err?.message ?? "");
       const isAuth = /401|invalid.*api.?key|authentication/i.test(msg);
       const friendly = isAuth
-        ? `⚠️ Ihr ${provider === "claude" ? "Claude" : "Mistral"} API-Key ist ungültig oder abgelaufen.\n\nBitte aktualisieren Sie ihn über das Zahnrad-Symbol auf der Datenimport-Seite.\n\nSie können bis dahin die Demo-Daten im Dashboard und CSRD-Report einsehen.`
+        ? `⚠️ Ihr ${PROVIDERS[provider].label} API-Key ist ungültig oder abgelaufen.\n\nBitte aktualisieren Sie ihn über das Zahnrad-Symbol auf der Datenimport-Seite.\n\nSie können bis dahin die Demo-Daten im Dashboard und CSRD-Report einsehen.`
         : `❌ Fehler bei der KI-Anfrage:\n${msg}`;
       setMessages((prev) => [
         ...prev,
