@@ -51,24 +51,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const eeio = buildFallbackResponse(bookingLines);
       let response: ClaudeResponse = eeio;
 
-      // 2) Optionally enrich anomalies + data quality via AI provider,
-      // capped so a slow/unreachable provider never blocks the demo.
+      // 2) Optionally enrich anomalies + data quality via AI provider — but
+      // never make the demo wait for it. A short fixed "show" delay always
+      // runs; the AI call races against it and is simply dropped if slower.
+      const SHOW_DURATION_MS = 1200;
+      const show = new Promise((r) => setTimeout(r, SHOW_DURATION_MS));
+
       if (!useMock && apiKey) {
         try {
-          const timeout = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("AI-Anfrage Timeout")), 5000)
-          );
-          const ai = await Promise.race([callClaudeAPI(provider, apiKey, bookingLines), timeout]);
-          response = {
-            zeilen: eeio.zeilen,
-            anomalien: ai.anomalien?.length ? ai.anomalien : eeio.anomalien,
-            datenqualitaet: ai.datenqualitaet ?? eeio.datenqualitaet,
-          };
+          const aiOrNothing = Promise.race([
+            callClaudeAPI(provider, apiKey, bookingLines),
+            show.then(() => null),
+          ]);
+          const [ai] = await Promise.all([aiOrNothing, show]);
+          if (ai) {
+            response = {
+              zeilen: eeio.zeilen,
+              anomalien: ai.anomalien?.length ? ai.anomalien : eeio.anomalien,
+              datenqualitaet: ai.datenqualitaet ?? eeio.datenqualitaet,
+            };
+          }
         } catch (apiErr) {
-          console.warn("AI provider failed or timed out — using EEIO-only result:", apiErr);
+          console.warn("AI provider failed or was slower than the demo — using EEIO-only result:", apiErr);
         }
       } else {
-        await new Promise((r) => setTimeout(r, ANALYSIS_STEPS.length * 150));
+        await show;
       }
 
       setClaudeResponse(response);
