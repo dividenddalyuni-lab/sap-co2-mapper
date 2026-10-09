@@ -51,17 +51,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const eeio = buildFallbackResponse(bookingLines);
       let response: ClaudeResponse = eeio;
 
-      // 2) Optionally enrich anomalies + data quality via AI provider
+      // 2) Optionally enrich anomalies + data quality via AI provider,
+      // capped so a slow/unreachable provider never blocks the demo.
       if (!useMock && apiKey) {
         try {
-          const ai = await callClaudeAPI(provider, apiKey, bookingLines);
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("AI-Anfrage Timeout")), 5000)
+          );
+          const ai = await Promise.race([callClaudeAPI(provider, apiKey, bookingLines), timeout]);
           response = {
             zeilen: eeio.zeilen,
             anomalien: ai.anomalien?.length ? ai.anomalien : eeio.anomalien,
             datenqualitaet: ai.datenqualitaet ?? eeio.datenqualitaet,
           };
         } catch (apiErr) {
-          console.warn("AI provider failed — using EEIO-only result:", apiErr);
+          console.warn("AI provider failed or timed out — using EEIO-only result:", apiErr);
         }
       } else {
         await new Promise((r) => setTimeout(r, ANALYSIS_STEPS.length * 150));
