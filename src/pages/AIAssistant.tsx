@@ -12,6 +12,38 @@ const quickActions = [
   "Kosten ohne CLYMAIQ?",
 ];
 
+const QUICK_ACTION_ANSWERS: Record<string, string> = {
+  "Warum ist mein EBITDA gesunken?":
+    "Das EBITDA der Muster GmbH liegt im Geschäftsjahr 2024 um 8,4 % unter dem Vorjahreswert. Die größten Treiber laut SAP-FICO-Daten:\n\n" +
+    "1. **Energiekosten** (+21 %) — Strom- und Erdgaspreise auf den Kostenstellen Produktion und Kältelager sind der größte Einzelfaktor.\n" +
+    "2. **Logistik/Spedition** (+14 %) — gestiegene Frachtraten bei Luft- und Seefracht, insbesondere Scope-3-Kategorie 4.\n" +
+    "3. **Rohwareneinkauf** (+9 %) — Importkosten Seafood/Südamerika deutlich über Plan.\n\n" +
+    "Zusammen erklären diese drei Positionen rund 70 % des EBITDA-Rückgangs. Empfehlung: Energiebeschaffung absichern (PPA/Fixpreisvertrag) und Frachtmix auf Seefracht statt Luftfracht umstellen — spart laut KI-Sparpotenzial ca. 340 t CO₂e und 58.000 € pro Jahr.",
+  "Scope-3-Emissionen?":
+    "Die Scope-3-Emissionen machen aktuell **68 %** der Gesamtbilanz aus (262 t CO₂e von insgesamt ca. 385 t CO₂e).\n\n" +
+    "Verteilung nach GHG-Protocol-Kategorien:\n" +
+    "- Kategorie 1 (eingekaufte Güter & Dienstleistungen): 41 %\n" +
+    "- Kategorie 4 (Transport & Distribution): 29 %\n" +
+    "- Kategorie 6 (Geschäftsreisen): 18 %\n" +
+    "- Sonstige (5, 11, 12): 12 %\n\n" +
+    "Größter Einzelposten: die Seafood-Importe aus Südamerika (Kostenstelle 5000, Q1 2024) mit knapp 985.000 € Einkaufsvolumen. Für CSRD/ESRS E1 fehlen noch belastbare Lieferantendaten zu Kategorie 1 — aktuell auf EEIO-Schätzung (Spend-Based) statt Primärdaten.",
+  "CO₂-Neutralität — Prognose":
+    "Bei gleichbleibendem Maßnahmentempo erreicht die Muster GmbH CO₂-Neutralität (Scope 1+2) voraussichtlich **2031**.\n\n" +
+    "Mit den im KI-Sparpotenzial identifizierten Sofortmaßnahmen (Energieeffizienz, Frachtoptimierung, Lieferantenwechsel) lässt sich das auf **2028** vorziehen — eine Reduktion um 3 Jahre.\n\n" +
+    "Wichtigste Hebel für die Beschleunigung:\n" +
+    "1. 100 % Grünstrombezug für Produktion und Kältelager (-18 % Scope 2)\n" +
+    "2. Dieselflotte schrittweise auf Elektro/HVO umstellen (-12 % Scope 1)\n" +
+    "3. Kompensation der verbleibenden unvermeidbaren Emissionen ab 2027\n\n" +
+    "Scope 3 bleibt dabei bewusst außen vor, da hierfür laut GHG Protocol kein verbindliches Neutralitätsziel vorgeschrieben ist, aber für CSRD-Reporting weiter transparent ausgewiesen wird.",
+  "Kosten ohne CLYMAIQ?":
+    "Ohne CLYMAIQ müsste die Muster GmbH die CSRD-Berichtspflicht manuell abdecken. Geschätzter Aufwand pro Jahr:\n\n" +
+    "- **Externe ESG-Beratung** für Erstbilanzierung & Wesentlichkeitsanalyse: ca. 35.000–60.000 €\n" +
+    "- **Interne Personalzeit** (Controlling/Nachhaltigkeit, ca. 0,5 FTE): ca. 40.000 €\n" +
+    "- **Wirtschaftsprüfer-Testat** für CSRD-Assurance: ca. 15.000–25.000 €\n" +
+    "- **Fehlerrisiko** durch manuelle Excel-Klassifizierung: schwer quantifizierbar, aber hohe Nacharbeits- und Bußgeldrisiken bei Falschangaben\n\n" +
+    "Gesamtaufwand ohne CLYMAIQ: **ca. 90.000–125.000 € pro Jahr**, bei deutlich geringerer Datenqualität und ohne laufende Anomalie-Erkennung. CLYMAIQ automatisiert Klassifizierung, Scope-Zuordnung und Report-Erstellung direkt aus den SAP-FICO-Rohdaten.",
+};
+
 const SYSTEM_PROMPT = `Du bist der CLYMAIQ KI-Assistent, ein Experte für ESG-Analyse, CO₂-Bilanzierung nach GHG Protocol und CSRD/ESRS Compliance.
 Du analysierst SAP FICO-Buchungsdaten eines deutschen Unternehmens (Muster GmbH, Geschäftsjahr 2024).
 Antworte immer auf Deutsch, präzise und fachlich fundiert. Verwende Zahlen und konkrete Empfehlungen wo möglich.`;
@@ -91,6 +123,18 @@ export default function AIAssistantPage() {
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     sendMessage(input);
+  };
+
+  const sendQuickAction = (action: string) => {
+    const canned = QUICK_ACTION_ANSWERS[action];
+    if (!canned || isLoading) return;
+
+    setMessages((prev) => [...prev, { role: "user", content: action }]);
+    setIsLoading(true);
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { role: "assistant", content: canned }]);
+      setIsLoading(false);
+    }, 3000);
   };
 
   return (
@@ -183,8 +227,8 @@ export default function AIAssistantPage() {
         {quickActions.map((action) => (
           <button
             key={action}
-            onClick={() => sendMessage(action)}
-            disabled={isLoading || !apiKey}
+            onClick={() => sendQuickAction(action)}
+            disabled={isLoading}
             className="px-4 py-2 border border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {action}
